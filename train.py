@@ -129,11 +129,11 @@ upsampled_logits = tf.nn.conv2d_transpose(upsampled_logits_pool4, upsample_filte
 unsample_logits_pool3_pool4 = upsampled_logits + aux_logits_16s_pool3
 
 #进行一次8倍上采样,最后相加
-upsample_filter_np_x16 = bilinear_upsample_weights(upsample_factor,
+upsample_filter_np_x8 = bilinear_upsample_weights(upsample_factor,
                                                    number_of_classes)
 
-upsample_filter_tensor_x16 = tf.Variable(upsample_filter_np_x16, name='vgg_16/fc8/t_conv_x16')
-upsampled_logits = tf.nn.conv2d_transpose(unsample_logits_pool3_pool4, upsample_filter_tensor_x16,
+upsample_filter_tensor_x8 = tf.Variable(upsample_filter_np_x8, name='vgg_16/fc8/t_conv_x8')
+upsampled_logits = tf.nn.conv2d_transpose(unsample_logits_pool3_pool4, upsample_filter_tensor_x8,
                                           output_shape=upsampled_logits_shape,
                                           strides=[1, upsample_factor, upsample_factor, 1],
                                           padding='SAME')
