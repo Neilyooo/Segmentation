@@ -36,7 +36,17 @@ aux_logits_16s_pool3 = slim.conv2d(pool3_feature, number_of_classes,[1,1],
 unsample_logits_pool3_pool4 = upsampled_logits + aux_logits_16s_pool3                                       
 ```
 * 然后从vgg_16中的endpoints['vgg_16/pool3']中取出feature maps,然后通过1x1卷积对其进行分类输出 aux_logits_16s_pool3。对上一步得到的upsampled_logits_pool4进行一次2x的上采样得到upsampled_logits,最后将两者相加得到unsample_logits_pool3_pool4。
+```
+upsample_filter_np_x8 = bilinear_upsample_weights(upsample_factor,
+                                                   number_of_classes)
+
+upsample_filter_tensor_x8 = tf.Variable(upsample_filter_np_x8, name='vgg_16/fc8/t_conv_x8')
+upsampled_logits = tf.nn.conv2d_transpose(unsample_logits_pool3_pool4, upsample_filter_tensor_x8,
+                                          output_shape=upsampled_logits_shape,
+                                          strides=[1, upsample_factor, upsample_factor, 1],
+                                          padding='SAME')
+```
 * 对上一步输出unsample_logits_pool3_pool4进行8x上采样。（这就是8s的实现,16s忽略掉从vgg16-pool3提取的featruemap）
 
 
-## 输出在云端[tinymind](https://www.tinymind.com/executions/kd0r0gwz "LipGallagher")
+### 输出在云端[tinymind](https://www.tinymind.com/executions/kd0r0gwz "LipGallagher")
